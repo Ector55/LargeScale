@@ -1,0 +1,386 @@
+:root {
+    --bg-deep: #0b0c15;
+    --glass-panel: rgba(30, 35, 60, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --ps-blue: #2d64bc;
+    --ps-light-blue: #5de0e6;
+    --text-main: #ffffff;
+    --text-dim: #a0a5b8;
+    --hours-color: rgb(60, 173, 60);
+}
+
+body{
+    background-color: var(--bg-deep);
+    background: radial-gradient(circle at 10% 20%, #151936 0%, var(--bg-deep) 80%);
+    margin: 0;
+    padding: 0;
+    font-family: "Orbitron", sans-serif;
+    overflow: hidden;
+}
+.parent {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(7, 1fr);
+    gap: 8px;
+    height: 100vh;
+    width: 100vw;
+}
+    
+.div1 {
+    grid-column: span 7 / span 7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    background: transparent;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    position: relative;
+    padding: 0 20px;
+    z-index: 10;
+}
+.title{
+    position: absolute;
+    left: 30px;
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    background: linear-gradient(90deg, #fff, var(--ps-light-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(93, 224, 230, 0.3);
+}
+.login-btn {
+    position: absolute;
+    right: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+    padding: 10px 30px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+.login-btn:hover {
+    background-color: var(--ps-light-blue);
+    color: #000;
+    border-color: var(--ps-light-blue);
+    box-shadow: 0 0 15px var(--ps-light-blue);
+    transform: scale(1.05);
+}
+.search-bar{
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+    padding: 10px 30px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    width: 100%; 
+    max-width: 600px;
+    margin: 0 250px; 
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+.search-bar:hover {
+    background-color: var(--ps-light-blue);
+    color: #000;
+    border-color: var(--ps-light-blue);
+    box-shadow: 0 0 15px var(--ps-light-blue);
+    transform: scale(1.05);
+}
+
+.div2, .div3{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 16px;
+    background-color: rgba(30, 35, 60, 0.85);;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.div2 {
+    grid-column: span 2 / span 2;
+    grid-row: span 6 / span 6;
+    grid-row-start: 2;
+    margin-left: 10px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.div2::-webkit-scrollbar {
+    width: 8px;
+}
+.div2::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    margin: 10px 0;
+}
+.div2::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.div2::-webkit-scrollbar-thumb:hover {
+    background: var(--ps-blue);
+    box-shadow: 0 0 10px var(--ps-blue);
+}
+
+
+.gamebox{
+    background-color: rgb(17, 23, 41);
+    padding: 10px;
+    margin: 10px;
+    border-radius: 10px;
+    height: 110px;
+    color: var(--text-main);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 0 2px var(--text-dim);
+    display: flex;
+    gap: 15px;
+    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.gamebox:hover{
+    transform: scale(1.01);
+}
+.gameImageBox{
+    width: 74px;
+    height: 111px;
+    border-radius: 10px;
+    box-shadow: 0 0 5px var(--glass-border);
+    position: static;
+    overflow: hidden;
+    flex-shrink: 0
+}
+.gameimage{
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease;
+    will-change: transform;
+    backface-visibility: hidden;
+}
+.gamebox:hover .gameimage{
+    transform: scale(1.1);
+}
+.gameInfo{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.gameTitle, .gameHour{
+    position: static;
+    margin: 0;
+    flex-shrink: 0
+}
+.gameHour{
+    font-weight: 100;
+    font-size: 17px;
+    color: var(--hours-color);
+}
+
+.div3{
+    grid-column: span 5 / span 5;
+    grid-row: span 6 / span 6;
+    grid-column-start: 3;
+    grid-row-start: 2;
+    margin-right: 10px;
+    display: flex;
+    flex-direction: column;
+}
+.suggestedGames, .suggestedPeople {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    color: var(--text-main);
+}
+.title2, .title3{
+    color: var(--text-main);
+    margin: 10px;
+    position: static;
+    padding: 0 10px;
+    flex-shrink: 0
+}
+.sgbox, .spbox {
+    flex: 1;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 0 2px var(--text-dim);
+    background-color: rgb(25, 35, 64);
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    gap: 15px;
+}
+.gameSugg{
+    display: flex;
+    flex-direction: row;
+    background-color: rgb(17, 23, 41);
+    padding: 10px;
+    border-radius: 10px;
+    height: 110px;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 0 2px var(--text-dim);
+    align-items: center;
+    transition: all 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.gameTitleSugg, .motivationSugg, .button-container{
+    flex: 1;
+    text-align: center;
+    flex-shrink: 0
+}
+.motivationSugg{
+    color: var(--hours-color);
+    font-weight: 100;
+    font-size: 15px;
+}
+.button-container{
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    text-align: center;
+}
+.add-btn{
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 1.2rem;
+    width: 50px;
+    height: 50px;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    text-align: center;
+}
+.gameSugg:hover{
+    transform: scale(1.01);
+}
+.gameSugg:hover .gameimage{
+    transform: scale(1.1);
+}
+.add-btn:hover{
+    background-color: var(--ps-light-blue);
+    color: #000;
+    border-color: var(--ps-light-blue);
+    box-shadow: 0 0 10px var(--ps-light-blue);
+    transform: scale(1.05);
+}
+
+.div2:hover, .div3:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 15px 40px 0 rgba(0, 0, 0, 0.5);
+    transform: translateY(-2px);
+}
+
+.sgbox::-webkit-scrollbar, .spbox::-webkit-scrollbar{
+    width: 8px;
+}
+.sgbox::-webkit-scrollbar-track, .spbox::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    margin: 10px 0;
+}
+.sgbox::-webkit-scrollbar-thumb, .spbox::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.sgbox::-webkit-scrollbar-thumb:hover, .spbox::-webkit-scrollbar-thumb:hover {
+    background: var(--ps-blue);
+    box-shadow: 0 0 10px var(--ps-blue);
+}
+.personSugg{
+    display: flex;
+    flex-direction: row;
+    background-color: rgb(17, 23, 41);
+    padding: 10px;
+    border-radius: 10px;
+    height: 110px;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 0 2px var(--text-dim);
+    align-items: center;
+    transition: all 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    flex-shrink: 0;
+}
+.avatar{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+}
+.userName{
+    flex: 1;
+    text-align: center;
+    flex-shrink: 0
+}
+.avatarImageContainer{
+    width: 90px;
+    height: 90px;
+    min-width: 90px;
+    min-height: 90px;
+    border-radius: 50%;
+    box-shadow: 0 0 5px var(--glass-border);
+    position: static;
+    overflow: hidden;
+    flex-shrink: 0
+}
+.avatarImage{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.5s ease;
+    will-change: transform;
+    backface-visibility: hidden;
+}
+.personSugg:hover{
+    transform: scale(1.01);
+}
+.personSugg:hover .avatarImage{
+    transform: scale(1.1);
+}
+
+
+/* Quando lo schermo è sotto i 1200px (Laptop piccoli) */
+@media (max-width: 1200px) {
+    .search-bar {
+        margin: 0 150px; /* Riduciamo i margini di sicurezza */
+    }
+}
+
+/* Quando lo schermo è sotto i 900px (Tablet/Mobile) */
+@media (max-width: 900px) {
+    /* Opzione 1: Nascondi il titolo per dare spazio alla ricerca */
+    .title {
+        display: none; 
+        /* Oppure potresti ridurre il font-size drasticamente */
+    }
+    .login-btn{
+        display: none;
+    }
+
+    /* La barra ora può prendersi tutto lo spazio centrale */
+    .search-bar {
+        margin: 0 100px 0 20px; /* Margine a destra per il login, a sinistra piccolo */
+        max-width: 100%;
+    }
+}
