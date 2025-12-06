@@ -132,8 +132,6 @@ body{
     background: var(--ps-blue);
     box-shadow: 0 0 10px var(--ps-blue);
 }
-
-
 .gamebox{
     background-color: rgb(17, 23, 41);
     padding: 10px;
@@ -284,9 +282,9 @@ body{
 }
 
 .div2:hover, .div3:hover {
-    border-color: rgba(255, 255, 255, 0.3);
     box-shadow: 0 15px 40px 0 rgba(0, 0, 0, 0.5);
     transform: translateY(-2px);
+    animation: border-pulse 4s infinite alternate;
 }
 
 .sgbox::-webkit-scrollbar, .spbox::-webkit-scrollbar{
@@ -359,28 +357,37 @@ body{
     transform: scale(1.1);
 }
 
-
-/* Quando lo schermo è sotto i 1200px (Laptop piccoli) */
-@media (max-width: 1200px) {
-    .search-bar {
-        margin: 0 150px; /* Riduciamo i margini di sicurezza */
+@keyframes border-pulse {
+    0% {
+        border-color: rgba(93, 224, 230, 0.2);
+        box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.3);
+    }
+    50% {
+        border-color: rgba(93, 224, 230, 0.8); /* Diventa più luminoso */
+        box-shadow: 0 0 25px rgba(93, 224, 230, 0.4); /* L'ombra brilla */
+    }
+    100% {
+        border-color: rgba(93, 224, 230, 0.2);
+        box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.3);
     }
 }
 
-/* Quando lo schermo è sotto i 900px (Tablet/Mobile) */
+
+@media (max-width: 1200px) {
+    .search-bar {
+        margin: 0 150px;
+    }
+}
+
 @media (max-width: 900px) {
-    /* Opzione 1: Nascondi il titolo per dare spazio alla ricerca */
     .title {
         display: none; 
-        /* Oppure potresti ridurre il font-size drasticamente */
     }
     .login-btn{
         display: none;
     }
-
-    /* La barra ora può prendersi tutto lo spazio centrale */
     .search-bar {
-        margin: 0 100px 0 20px; /* Margine a destra per il login, a sinistra piccolo */
+        margin: 0 100px 0 20px;
         max-width: 100%;
     }
 }
