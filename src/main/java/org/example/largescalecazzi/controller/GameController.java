@@ -1,7 +1,8 @@
 package org.example.largescalecazzi.controller;
 
-import org.example.largescalecazzi.model.Game;
-import org.example.largescalecazzi.repo.GameRepo;
+import org.example.largescalecazzi.model.GameMongo;
+import org.example.largescalecazzi.repository.GameRepository;
+import org.example.largescalecazzi.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,10 +13,10 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class GameController {
     @Autowired
-    private GameRepo gameRepo;
+    private GameService gameService;
 
     @GetMapping
-    public List<Game> findAll() {
-        return gameRepo.findAll();
+    public List<GameMongo> findAll() {
+        return gameService.findAllGame();
     }
 }
