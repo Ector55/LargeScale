@@ -4,6 +4,8 @@ import org.example.largescalecazzi.model.GameMongo;
 import org.example.largescalecazzi.repository.GameRepository;
 import org.example.largescalecazzi.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +18,12 @@ public class GameController {
     private GameService gameService;
 
     @GetMapping
-    public List<GameMongo> findAll() {
-        return gameService.findAllGame();
+    public ResponseEntity<Page<GameMongo>> getAllGames(
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "20") int pageSize,
+            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "ASC") String direction
+    ){
+        return ResponseEntity.ok(gameService.getAllGames(pageNumber, pageSize, sortBy, direction));
     }
 }

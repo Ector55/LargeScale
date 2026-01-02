@@ -17,9 +17,7 @@ import java.time.Instant;
 public class ReviewMongo {
     @Id
     private String id;
-    @Indexed
     private String userId;
-    @Indexed
     private String gameId;
     private Integer score;
     private String description;
