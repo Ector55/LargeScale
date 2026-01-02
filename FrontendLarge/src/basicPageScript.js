@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const slides = document.querySelectorAll('.slide');
     let currentIndex = 0;
-    const intervalTime = 5000; 
+    const intervalTime = 3000; 
 
     function nextSlide() {
         const currentSlide = slides[currentIndex];

@@ -92,6 +92,20 @@ body{
     box-shadow: 0 0 15px var(--ps-light-blue);
     transform: scale(1.05);
 }
+.search-bar:focus {
+    background-color: var(--ps-light-blue);
+    color: #000;
+    border-color: var(--ps-light-blue);
+    box-shadow: 0 0 15px var(--ps-light-blue);
+    transform: scale(1.05);
+}
+.search-bar:active {
+    background-color: var(--ps-light-blue);
+    color: #000;
+    border-color: var(--ps-light-blue);
+    box-shadow: 0 0 15px var(--ps-light-blue);
+    transform: scale(1.05);
+}
 
 .div2, .div3{
     margin-top: 10px;
@@ -355,6 +369,21 @@ body{
 }
 .personSugg:hover .avatarImage{
     transform: scale(1.1);
+}
+.user-avatar {
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    right: 30px;
+    border: 2px solid var(--glass-border);
+    border-radius: 50%;
+    object-fit: contain;
+    transition: all 0.3s ease;
+}
+.user-avatar:hover {
+    border-color: var(--ps-light-blue);
+    box-shadow: 0 0 15px var(--ps-light-blue);
+    transform: scale(1.05);
 }
 
 @keyframes border-pulse {

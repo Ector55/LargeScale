@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GamerConnect</title>
     <link rel="icon" type="image/png" href="./src/logo.png">
-    <link rel="stylesheet" href="./src/login.css">
+    <link rel="stylesheet" href="./src/register.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
@@ -18,14 +18,22 @@
     </div>
     <div class="parent">
         <div class="div1">
-            <a href="/basicPage.html" class="title">GamerConnect</a>
-            <a href="/login.html" class="register-btn">REGISTER</a>
+            <h1 class="title">GamerConnect</h1>
+            <a href="/login.html" class="login-btn">LOGIN</a>
         </div>
         <div class="div2">
             <div class="login-container">
                 <div class="login-section left">
-                    <h2 class="section-title">SYSTEM LOGIN</h2>
+                    <h2 class="section-title">SYSTEM REGISTRATION</h2>
                     <form action="#" class="cyber-form">
+                        <div class="input-group">
+                            <label>Full Name</label>
+                            <input type="text" placeholder="Name Surname" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Username</label>
+                            <input type="text" placeholder="Username" required>
+                        </div>
                         <div class="input-group">
                             <label>Email</label>
                             <input type="email" placeholder="user@net.com" required>
@@ -35,7 +43,7 @@
                             <input type="password" placeholder="••••••••" required>
                         </div>
                         <button type="submit" class="action-btn main-login">
-                            LOGIN
+                            REGISTER
                         </button>
                     </form>
                 </div>
