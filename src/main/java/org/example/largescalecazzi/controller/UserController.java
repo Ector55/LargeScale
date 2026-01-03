@@ -4,10 +4,7 @@ import org.example.largescalecazzi.model.UserMongo;
 import org.example.largescalecazzi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -34,6 +31,34 @@ public class UserController {
             return ResponseEntity.ok(myGames);
         } catch(Exception e){
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/{userId}/games/{gameId}")
+    public ResponseEntity<String> addGame(
+            @PathVariable String userId,
+            @PathVariable String gameId
+    ){
+        try {
+            userService.addGameToLibrary(userId, gameId);
+            return ResponseEntity.ok("Game added");
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body("ERROR: " + e.getMessage());
+        }
+    }
+
+    @PatchMapping("/{userId}/games/{gameId}")
+    public ResponseEntity<String> updateGameHours(
+            @PathVariable String userId,
+            @PathVariable String gameId,
+            @RequestParam double hours
+    ){
+        try{
+            userService.updateGameHours(userId, gameId, hours);
+            return ResponseEntity.ok("Game hours updated");
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("ERROR: " + e.getMessage());
         }
     }
 }

@@ -16,7 +16,7 @@ public class GameMongo {
     @Id
     private String id;
 
-    @Indexed(unique = true)
+    @Indexed
     private String title;
     private String description;
     private String img;
