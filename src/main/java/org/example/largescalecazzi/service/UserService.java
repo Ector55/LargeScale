@@ -74,7 +74,9 @@ public class UserService {
                 .findFirst()
                 .orElseThrow(()-> new RuntimeException("Game with id" + gameID + " not found"));
 
-        game.setHours(hours);
+        double currentHours = game.getHours();
+        game.setHours(currentHours + hours);
+        
         updateTopList(userMongo);
         userRepository.save(userMongo);
     }
