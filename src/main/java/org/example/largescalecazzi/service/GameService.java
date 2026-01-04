@@ -1,8 +1,8 @@
 package org.example.largescalecazzi.service;
 
 import org.example.largescalecazzi.model.GameMongo;
-import org.example.largescalecazzi.repository.GameRepository;
-import org.example.largescalecazzi.repository.ReviewRepository;
+import org.example.largescalecazzi.repository.GameMongoRepository;
+import org.example.largescalecazzi.repository.ReviewMongoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class GameService {
     @Autowired
-    private GameRepository gameRepository;
+    private GameMongoRepository gameMongoRepository;
     @Autowired
-    private ReviewRepository reviewRepository;
+    private ReviewMongoRepository reviewMongoRepository;
 
     public Page<GameMongo> getAllGames(int pageNumber, int pageSize, String sortBy, String sortDirection) {
         if(pageSize > 50){
@@ -25,6 +25,6 @@ public class GameService {
 
         PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortBy));
 
-        return gameRepository.findAll(pageRequest);
+        return gameMongoRepository.findAll(pageRequest);
     }
 }

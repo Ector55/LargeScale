@@ -2,8 +2,8 @@ package org.example.largescalecazzi.service;
 
 import org.example.largescalecazzi.model.GameMongo;
 import org.example.largescalecazzi.model.UserMongo;
-import org.example.largescalecazzi.repository.GameRepository;
-import org.example.largescalecazzi.repository.UserRepository;
+import org.example.largescalecazzi.repository.GameMongoRepository;
+import org.example.largescalecazzi.repository.UserMongoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +14,12 @@ import java.util.List;
 @Service
 public class UserService {
     @Autowired
-    private UserRepository userRepository;
+    private UserMongoRepository userMongoRepository;
     @Autowired
-    private GameRepository gameRepository;
+    private GameMongoRepository gameMongoRepository;
 
     public List<UserMongo.TopPlayedGames> getTopGames(String userID){
-        UserMongo userMongo = userRepository.findById(userID)
+        UserMongo userMongo = userMongoRepository.findById(userID)
                 .orElseThrow(()-> new RuntimeException("User with id" + userID + "not found"));
         List<UserMongo.TopPlayedGames> topGames = userMongo.getTopPlayedGames();
         if(topGames == null){
@@ -29,7 +29,7 @@ public class UserService {
     }
 
     public List<UserMongo.MyGames> getMyGames(String userID){
-        UserMongo userMongo = userRepository.findById(userID)
+        UserMongo userMongo = userMongoRepository.findById(userID)
                 .orElseThrow(()-> new RuntimeException("User with id" + userID + "not found"));
         List<UserMongo.MyGames> myGames = userMongo.getMyGames();
         if(myGames == null){
@@ -39,14 +39,14 @@ public class UserService {
     }
 
     public void addGameToLibrary(String userID, String gameID){
-        UserMongo userMongo = userRepository.findById(userID)
+        UserMongo userMongo = userMongoRepository.findById(userID)
                 .orElseThrow(()-> new RuntimeException("User with id" + userID + "not found"));
 
         if(userMongo.getMyGames() == null){
             userMongo.setMyGames(new ArrayList<>());
         }
 
-        if(!gameRepository.existsById(gameID)){
+        if(!gameMongoRepository.existsById(gameID)){
             throw new RuntimeException("Game with id" + gameID + " not found");
         }
 
@@ -58,11 +58,11 @@ public class UserService {
         UserMongo.MyGames myGames = new UserMongo.MyGames(gameID, 0.0);
         userMongo.getMyGames().add(myGames);
 
-        userRepository.save(userMongo);
+        userMongoRepository.save(userMongo);
     }
 
     public void updateGameHours(String userID, String gameID, double hours){
-        UserMongo userMongo = userRepository.findById(userID)
+        UserMongo userMongo = userMongoRepository.findById(userID)
                 .orElseThrow(()-> new RuntimeException("User with id" + userID + "not found"));
 
         if(userMongo.getMyGames() == null){
@@ -76,9 +76,9 @@ public class UserService {
 
         double currentHours = game.getHours();
         game.setHours(currentHours + hours);
-        
+
         updateTopList(userMongo);
-        userRepository.save(userMongo);
+        userMongoRepository.save(userMongo);
     }
 
     private void updateTopList(UserMongo userMongo){
@@ -102,7 +102,7 @@ public class UserService {
                 existingGame.setHours(myGame.getHours());
                 newTopPlayed.add(existingGame);
             } else {
-                GameMongo gameMongo = gameRepository.findById(myGame.getGameId())
+                GameMongo gameMongo = gameMongoRepository.findById(myGame.getGameId())
                         .orElseThrow(()-> new RuntimeException("Game with id" + myGame.getGameId() + "not found"));
 
                 UserMongo.TopPlayedGames topPlayedGames = new UserMongo.TopPlayedGames(
