@@ -59,6 +59,8 @@ public class UserService {
         userMongo.getMyGames().add(myGames);
 
         userMongoRepository.save(userMongo);
+
+
     }
 
     public void updateGameHours(String userID, String gameID, double hours){
