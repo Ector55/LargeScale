@@ -25,4 +25,24 @@ public class GameController {
     ){
         return ResponseEntity.ok(gameService.getAllGames(pageNumber, pageSize, sortBy, direction));
     }
+
+    @GetMapping("/{gameId}/lastReviews")
+    public ResponseEntity<List<GameMongo.LastReviews>> getLastReviews(@PathVariable String gameId){
+        try{
+            List<GameMongo.LastReviews> lastReviews = gameService.getLastReviews(gameId);
+            return ResponseEntity.ok(lastReviews);
+        } catch(Exception e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/{gameId}/lastReviews")
+    public ResponseEntity<List<GameMongo.AllGameReviews>> getAllGameReviews(@PathVariable String gameId){
+        try{
+            List<GameMongo.AllGameReviews> allGameReviews = gameService.getAllReviews(gameId);
+            return ResponseEntity.ok(allGameReviews);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

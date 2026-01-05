@@ -9,6 +9,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.List;
+
 @Service
 public class GameService {
     @Autowired
@@ -27,4 +30,25 @@ public class GameService {
 
         return gameMongoRepository.findAll(pageRequest);
     }
+
+    public List<GameMongo.LastReviews> getLastReviews(String gameId) {
+        GameMongo gameMongo = gameMongoRepository.findById(gameId).
+                orElseThrow(()-> new RuntimeException("Game with id" + gameId + "not found"));
+        List<GameMongo.LastReviews> lastReviews = gameMongo.getLastReviews();
+        if (lastReviews.isEmpty()){
+            return Collections.emptyList();
+        }
+        return lastReviews;
+    }
+
+    public List<GameMongo.AllGameReviews> getAllReviews(String gameId) {
+        GameMongo gameMongo = gameMongoRepository.findById(gameId)
+                .orElseThrow(()-> new RuntimeException("Game with id" + gameId + "not found"));
+        List<GameMongo.AllGameReviews> allGameReviews = gameMongo.getAllGameReviews();
+        if (allGameReviews.isEmpty()){
+            return Collections.emptyList();
+        }
+        return allGameReviews;
+    }
+
 }
