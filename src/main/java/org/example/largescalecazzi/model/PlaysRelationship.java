@@ -14,9 +14,10 @@ public class PlaysRelationship {
     private Long id;
 
     @TargetNode
-    private GameNeo4j game; // Riferimento alla nuova classe
+    private GameNeo4j game;
 
     private Double hours;
+    private Integer score;
 
     public PlaysRelationship(GameNeo4j game, Double hours) {
         this.game = game;
