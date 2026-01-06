@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 
@@ -23,7 +24,18 @@ public class GameMongo {
     private List<String> genres;
 
     private List<LastReviews> lastReviews;
+
+    @Field("showOtherReviews")
     private List<AllGameReviews> allGameReviews;
+
+    @Field("total_score")
+    private Integer totalScore;
+
+    @Field("reviews_count")
+    private Integer reviewsCount;
+
+    @Field("average_score")
+    private Double averageScore;
 
     @Data
     @NoArgsConstructor

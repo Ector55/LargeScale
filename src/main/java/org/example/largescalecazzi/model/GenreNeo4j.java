@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GenreNeo4j {
     @Id
-    private String name; // es. "RPG", "FPS"
+    private String name;
 }

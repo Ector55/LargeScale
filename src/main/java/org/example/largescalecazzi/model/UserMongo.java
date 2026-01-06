@@ -22,6 +22,8 @@ public class UserMongo {
     private String password;
     private String role;
 
+    private List<String> friends;
+
     private List<MyGames> myGames;
     private List<TopPlayedGames> topPlayedGames;
 

@@ -36,7 +36,7 @@ public class GameController {
         }
     }
 
-    @GetMapping("/{gameId}/lastReviews")
+    @GetMapping("/{gameId}/allReviews")
     public ResponseEntity<List<GameMongo.AllGameReviews>> getAllGameReviews(@PathVariable String gameId){
         try{
             List<GameMongo.AllGameReviews> allGameReviews = gameService.getAllReviews(gameId);
