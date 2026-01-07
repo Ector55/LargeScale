@@ -1,5 +1,7 @@
 package org.example.largescalecazzi.controller;
 
+import org.example.largescalecazzi.DTO.GameCardDTO;
+import org.example.largescalecazzi.DTO.TrendingGameDTO;
 import org.example.largescalecazzi.model.GameMongo;
 import org.example.largescalecazzi.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,8 @@ public class GameController {
     @Autowired
     private GameService gameService;
 
+    // query per test: localhost:8080/api/games/top-rated
+    // query per test: localhost:8080/api/games/top-rated?genre=Action
     @GetMapping
     public ResponseEntity<Page<GameMongo>> getAllGames(
             @RequestParam(defaultValue = "0") int pageNumber,
@@ -44,5 +48,31 @@ public class GameController {
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    // query test: localhost:8080/api/games/top-rated
+    @GetMapping("/top-rated")
+    public ResponseEntity<List<GameCardDTO>> getTopRatedGames(
+            @RequestParam(required = false) String genre
+    ) {
+        return ResponseEntity.ok(gameService.getTopRatedGames(genre));
+    }
+
+    //localhost:8080/api/games/trending/declining
+    @GetMapping("/trending/declining")
+    public ResponseEntity<List<TrendingGameDTO>> getDecliningGames() {
+        return ResponseEntity.ok(gameService.getDecliningGames());
+    }
+
+    // query test: localhost:8080/api/games/trending/improving
+    @GetMapping("/trending/improving")
+    public ResponseEntity<List<TrendingGameDTO>> getImprovingGames() {
+        return ResponseEntity.ok(gameService.getImprovingGames());
+    }
+
+    // query test: localhost:8080/api/games/hidden-gems
+    @GetMapping("/hidden-gems")
+    public ResponseEntity<List<GameCardDTO>> getHiddenGems() {
+        return ResponseEntity.ok(gameService.getHiddenGems());
     }
 }

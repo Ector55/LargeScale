@@ -1,5 +1,7 @@
 package org.example.largescalecazzi.service;
 
+import org.example.largescalecazzi.DTO.GameCardDTO;
+import org.example.largescalecazzi.DTO.TrendingGameDTO;
 import org.example.largescalecazzi.model.GameMongo;
 import org.example.largescalecazzi.repository.GameMongoRepository;
 import org.example.largescalecazzi.repository.ReviewMongoRepository;
@@ -51,4 +53,20 @@ public class GameService {
         return allGameReviews;
     }
 
+    public List<GameCardDTO> getTopRatedGames(String genre) {
+        String filterGenre = (genre == null || genre.trim().isEmpty()) ? null : genre;
+        return gameMongoRepository.findTop10BestRatedGames(filterGenre);
+    }
+
+    public List<TrendingGameDTO> getDecliningGames() {
+        return gameMongoRepository.findTopDecliningGames();
+    }
+
+    public List<TrendingGameDTO> getImprovingGames() {
+        return gameMongoRepository.findTopImprovingGames();
+    }
+
+    public List<GameCardDTO> getHiddenGems() {
+        return gameMongoRepository.findHiddenGems();
+    }
 }
