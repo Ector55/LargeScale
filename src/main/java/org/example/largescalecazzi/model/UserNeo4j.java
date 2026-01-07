@@ -26,4 +26,9 @@ public class UserNeo4j {
     // RELAZIONE CON I GIOCHI
     @Relationship(type = "PLAYS", direction = Relationship.Direction.OUTGOING)
     private List<PlaysRelationship> gamesPlayed;
+
+    public UserNeo4j(String userId, String username) {
+        this.userId = userId;
+        this.username = username;
+    }
 }

@@ -2,10 +2,13 @@ package org.example.largescalecazzi.service;
 
 import org.example.largescalecazzi.model.GameMongo;
 import org.example.largescalecazzi.model.UserMongo;
+import org.example.largescalecazzi.model.UserNeo4j;
 import org.example.largescalecazzi.repository.GameMongoRepository;
 import org.example.largescalecazzi.repository.UserMongoRepository;
+import org.example.largescalecazzi.repository.UserNeo4jRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.dao.DuplicateKeyException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,6 +23,44 @@ public class UserService {
     @Autowired
     private GameMongoRepository gameMongoRepository;
 
+    // --- REGISTRAZIONE ---
+    public UserMongo registerUser(UserMongo newUser) {
+        UserMongo savedUser;
+
+        //Salvataggio su MongoDb
+        try {
+            return userMongoRepository.save(newUser);
+
+        } catch (DuplicateKeyException e) {
+            throw new RuntimeException("Errore: Username o Email già esistenti");
+        }
+
+        //va implementato ancora il salvataggio Neo4j
+    }
+
+    // --- DELETE USER ---
+    public void deleteUser(String userId) {
+        // Dobbiamo cancellare l'id dell'user dalle liste di amicizie degli altri utenti
+        UserMongo userToDelete = userMongoRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+
+        if (userToDelete.getFriends() != null && !userToDelete.getFriends().isEmpty()) {
+            for (String friendId : userToDelete.getFriends()) {
+                userMongoRepository.findById(friendId).ifPresent(friend -> {
+                    if (friend.getFriends() != null) {
+                        boolean removed = friend.getFriends().remove(userId);
+                        if (removed) {
+                            userMongoRepository.save(friend);
+                        }
+                    }
+                });
+            }
+        }
+
+        userMongoRepository.deleteById(userId);
+    }
+
+    // --- GETTERS ---
     public List<UserMongo.TopPlayedGames> getTopGames(String userID){
         UserMongo userMongo = userMongoRepository.findById(userID)
                 .orElseThrow(()-> new RuntimeException("User with id" + userID + "not found"));
@@ -40,6 +81,7 @@ public class UserService {
         return myGames;
     }
 
+    // --- LIBRERIA GIOCHI ---
     public void addGameToLibrary(String userID, String gameID){
         UserMongo userMongo = userMongoRepository.findById(userID)
                 .orElseThrow(()-> new RuntimeException("User with id" + userID + "not found"));
@@ -54,7 +96,7 @@ public class UserService {
 
         boolean alreadyExists = userMongo.getMyGames().stream().anyMatch(g -> g.getGameId().equals(gameID));
         if(alreadyExists){
-            throw new RuntimeException("You just own this game!");
+            throw new RuntimeException("You already own this game!");
         }
 
         UserMongo.MyGames myGames = new UserMongo.MyGames(gameID, 0.0);
@@ -139,4 +181,54 @@ public class UserService {
         }
         userMongo.setTopPlayedGames(newTopPlayed);
     }
+
+
+    // --- 4. GESTIONE FRIENDS ---
+    public void addFriend(String userId, String friendId) {
+        if (userId.equals(friendId)) throw new RuntimeException("Non puoi essere amico di te stesso!");
+
+        UserMongo user = userMongoRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+        UserMongo friend = userMongoRepository.findById(friendId)
+                .orElseThrow(() -> new RuntimeException("Friend not found: " + friendId));
+
+        if (user.getFriends() == null) user.setFriends(new ArrayList<>());
+        if (friend.getFriends() == null) friend.setFriends(new ArrayList<>());
+
+        boolean changed = false;
+
+        // Aggiungo B agli amici di A
+        if (!user.getFriends().contains(friendId)) {
+            user.getFriends().add(friendId);
+            userMongoRepository.save(user);
+            changed = true;
+        }
+
+        // Aggiungo A agli amici di B (Amicizia bidirezionale)
+        if (!friend.getFriends().contains(userId)) {
+            friend.getFriends().add(userId);
+            userMongoRepository.save(friend);
+            changed = true;
+        }
+
+        if (!changed) {
+            throw new RuntimeException("Siete già amici!");
+        }
+    }
+
+    public void removeFriend(String userId, String friendId) {
+        UserMongo user = userMongoRepository.findById(userId).orElseThrow();
+        UserMongo friend = userMongoRepository.findById(friendId).orElseThrow();
+
+        if (user.getFriends() == null) return;
+        if (friend.getFriends() == null) return;
+
+        if (user.getFriends().remove(friendId)) {
+            userMongoRepository.save(user);
+        }
+        if (friend.getFriends().remove(userId)) {
+            userMongoRepository.save(friend);
+        }
+    }
+
 }
