@@ -37,7 +37,7 @@ public class GameService {
         GameMongo gameMongo = gameMongoRepository.findById(gameId).
                 orElseThrow(()-> new RuntimeException("Game with id" + gameId + "not found"));
         List<GameMongo.LastReviews> lastReviews = gameMongo.getLastReviews();
-        if (lastReviews.isEmpty()){
+        if (lastReviews == null || lastReviews.isEmpty()){
             return Collections.emptyList();
         }
         return lastReviews;
@@ -47,7 +47,7 @@ public class GameService {
         GameMongo gameMongo = gameMongoRepository.findById(gameId)
                 .orElseThrow(()-> new RuntimeException("Game with id" + gameId + "not found"));
         List<GameMongo.AllGameReviews> allGameReviews = gameMongo.getAllGameReviews();
-        if (allGameReviews.isEmpty()){
+        if (allGameReviews == null ||allGameReviews.isEmpty()){
             return Collections.emptyList();
         }
         return allGameReviews;

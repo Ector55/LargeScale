@@ -1,5 +1,6 @@
 package org.example.largescalecazzi.model;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,8 +18,11 @@ import java.time.Instant;
 public class ReviewMongo {
     @Id
     private String id;
+    @NotBlank(message = "UserId can't be blank")
     private String userId;
+    @NotBlank(message = "GameId can't be blank")
     private String gameId;
+    @NotBlank(message = "Score can't be blank")
     private Integer score;
     private String description;
     private Instant timestamp;

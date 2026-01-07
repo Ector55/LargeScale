@@ -231,4 +231,7 @@ public class UserService {
         }
     }
 
+    public boolean userExists(String userId) {
+        return userMongoRepository.existsById(userId);
+    }
 }

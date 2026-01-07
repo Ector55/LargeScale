@@ -1,4 +1,5 @@
 package org.example.largescalecazzi.model;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,9 +19,12 @@ public class GameMongo {
     private String id;
 
     @Indexed
+    @NotBlank(message = "Title can't be blank")
     private String title;
+    @NotBlank(message = "Description can't be blank")
     private String description;
     private String img;
+    @NotBlank(message = "Genres can't be blank")
     private List<String> genres;
 
     private List<LastReviews> lastReviews;
