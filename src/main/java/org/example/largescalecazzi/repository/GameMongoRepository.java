@@ -5,6 +5,7 @@ import org.example.largescalecazzi.DTO.TrendingGameDTO;
 import org.example.largescalecazzi.model.GameMongo;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
@@ -105,4 +106,18 @@ public interface GameMongoRepository extends MongoRepository<GameMongo, String> 
     })
     List<GameCardDTO> findHiddenGems();
 
+    // SEARCH BAR
+    // ricerca per titolo, restituisce solo dati per la Card --> proiezione: Esclude descrizione, generi, recensioni.
+    @Query(value = "{ 'title': { '$regex': ?0, '$options': 'i' } }",
+            fields = "{ 'title': 1, 'img': 1, 'average_score': 1, 'reviews_count': 1, '_id': 1 }")
+    List<GameMongo> findByTitleRegex(String regexPattern);
+
+    // Visualizzazione LIBRERIA
+    @Query(value = "{ '_id': { '$in': ?0 } }", fields = "{ 'title': 1, 'img': 1, '_id': 1 }")
+    List<GameMongo> findBasicInfoByIds(List<String> ids);
+
+    // Scarichiamo solo la lista degli ID delle recensioni linkate allGameReviews e '_id'.
+    @Query(value = "{ '_id': ?0 }", fields = "{ 'showOtherReviews': 1, '_id': 1 }")
+    GameMongo findLinkedReviewsOnly(String gameId);
 }
+

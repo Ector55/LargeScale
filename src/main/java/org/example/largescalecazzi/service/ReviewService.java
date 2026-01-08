@@ -102,4 +102,58 @@ public class ReviewService {
 
         gameMongoRepository.save(game);
     }
+
+    public void deleteReview(String reviewId, String userId) {
+        ReviewMongo review = reviewMongoRepository.findById(reviewId)
+                .orElseThrow(() -> new RuntimeException("Review not found"));
+
+        if (!review.getUserId().equals(userId)) {
+            throw new RuntimeException("You can't delete reviews because you are not the owner of this game");
+        }
+
+        GameMongo game = gameMongoRepository.findById(review.getGameId())
+                .orElseThrow(() -> new RuntimeException("Game not found linked to review"));
+
+        // 4. Aggiorno le statistiche e le liste dentro il Gioco
+        removeReviewFromGameStats(game, review);
+
+        // 5. Cancello fisicamente la review dalla collection
+        reviewMongoRepository.delete(review);
+    }
+
+    private void removeReviewFromGameStats(GameMongo game, ReviewMongo review) {
+        // Rimuovo dalla lista embedded "LastReviews"
+        if (game.getLastReviews() != null) {
+            game.getLastReviews().removeIf(r ->
+                    r.getReviewId() != null && r.getReviewId().equals(review.getId())
+            );
+        }
+
+        // Rimuovo dalla lista linked "AllGameReviews"
+        if (game.getAllGameReviews() != null) {
+            game.getAllGameReviews().removeIf(r ->
+                    r.getReviewId() != null && r.getReviewId().equals(review.getId())
+            );
+        }
+
+        // Ricalcolo statistiche
+        int currentCount = game.getReviewsCount() == null ? 0 : game.getReviewsCount();
+        int currentTotal = game.getTotalScore() == null ? 0 : game.getTotalScore();
+
+        int newCount = Math.max(0, currentCount - 1);
+        int newTotal = Math.max(0, currentTotal - review.getScore());
+
+        double newAverage = 0.0;
+        if (newCount > 0) {
+            newAverage = (double) newTotal / newCount;
+            // Arrotondamento a 2 decimali
+            newAverage = Math.round(newAverage * 100.0) / 100.0;
+        }
+
+        game.setReviewsCount(newCount);
+        game.setTotalScore(newTotal);
+        game.setAverageScore(newAverage);
+
+        gameMongoRepository.save(game);
+    }
 }

@@ -45,6 +45,7 @@ public class GameMongo {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LastReviews{
+        @Field("_id")
         private String reviewId;
         private String userId;
         private Integer score;

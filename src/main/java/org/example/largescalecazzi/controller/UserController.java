@@ -1,5 +1,7 @@
 package org.example.largescalecazzi.controller;
 
+import org.example.largescalecazzi.DTO.LibraryGameDTO;
+import org.example.largescalecazzi.DTO.UserCardDTO;
 import org.example.largescalecazzi.model.UserMongo;
 import org.example.largescalecazzi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,10 +66,10 @@ public class UserController {
 
     // Query test GET: localhost:8080/api/users/{USER_ID}/library
     @GetMapping("/{userId}/library")
-    public ResponseEntity<List<UserMongo.MyGames>> getMyGames(@PathVariable String userId){
+    public ResponseEntity<List<LibraryGameDTO>> getMyGames(@PathVariable String userId){
         try{
-            List<UserMongo.MyGames> myGames = userService.getMyGames(userId);
-            return ResponseEntity.ok(myGames);
+            // Il Service ora fa il "Merge" e restituisce i dati pronti per il Frontend
+            return ResponseEntity.ok(userService.getMyGames(userId));
         } catch(Exception e){
             return ResponseEntity.notFound().build();
         }
@@ -96,6 +98,7 @@ public class UserController {
             @PathVariable String gameId,
             @RequestParam double hours
     ){
+
         try{
             userService.updateGameHours(userId, gameId, hours);
             return ResponseEntity.ok("Game hours updated");
@@ -134,5 +137,19 @@ public class UserController {
         }
     }
 
+    // Query test: GET localhost:8080/api/users/search?q=mario
+    @GetMapping("/search")
+    public ResponseEntity<List<UserCardDTO>> searchUsers(@RequestParam("q") String query) {
+        return ResponseEntity.ok(userService.searchUsers(query));
+    }
 
+    // Query test: GET localhost:8080/api/users/{id}/friends
+    @GetMapping("/{userId}/friends")
+    public ResponseEntity<List<UserCardDTO>> getUserFriendsDetails(@PathVariable String userId) {
+        try {
+            return ResponseEntity.ok(userService.getUserFriendsDetails(userId));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

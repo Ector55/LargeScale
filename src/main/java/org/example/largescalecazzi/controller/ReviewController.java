@@ -35,4 +35,20 @@ public class ReviewController {
         }
     }
 
+    // DELETE: Cancella recensione
+    // Query test DELETE: localhost:8080/api/reviews/{reviewId}?userId={USER_ID}
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<String> deleteReview(
+            @PathVariable String reviewId,
+            @RequestParam String userId
+    ) {
+        try {
+            reviewService.deleteReview(reviewId, userId);
+            return ResponseEntity.ok("Review deleted successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
+    }
 }

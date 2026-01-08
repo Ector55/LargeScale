@@ -1,5 +1,7 @@
 package org.example.largescalecazzi.service;
 
+import org.example.largescalecazzi.DTO.LibraryGameDTO;
+import org.example.largescalecazzi.DTO.UserCardDTO;
 import org.example.largescalecazzi.model.GameMongo;
 import org.example.largescalecazzi.model.UserMongo;
 import org.example.largescalecazzi.model.UserNeo4j;
@@ -71,14 +73,37 @@ public class UserService {
         return topGames;
     }
 
-    public List<UserMongo.MyGames> getMyGames(String userID){
-        UserMongo userMongo = userMongoRepository.findById(userID)
-                .orElseThrow(()-> new RuntimeException("User with id" + userID + "not found"));
-        List<UserMongo.MyGames> myGames = userMongo.getMyGames();
-        if(myGames == null){
+    public List<LibraryGameDTO> getMyGames(String userId) {
+        // RECUPERO SOLO LA LISTA GIOCHI. Scarica solo 'myGames', ignorando amici, password, ecc.
+        UserMongo user = userMongoRepository.findMyGamesOnly(userId);
+
+        if (user == null) {
+            throw new RuntimeException("User not found: " + userId);
+        }
+
+        if (user.getMyGames() == null || user.getMyGames().isEmpty()) {
             return Collections.emptyList();
         }
-        return myGames;
+
+        List<String> gameIds = user.getMyGames().stream()
+                .map(UserMongo.MyGames::getGameId)
+                .collect(Collectors.toList());
+
+        Map<String, GameMongo> gamesMap = gameMongoRepository.findBasicInfoByIds(gameIds).stream()
+                .collect(Collectors.toMap(GameMongo::getId, g -> g));
+
+        return user.getMyGames().stream()
+                .filter(myGame -> gamesMap.containsKey(myGame.getGameId()))
+                .map(myGame -> {
+                    GameMongo details = gamesMap.get(myGame.getGameId());
+                    return new LibraryGameDTO(
+                            details.getId(),
+                            details.getTitle(),
+                            details.getImg(),
+                            myGame.getHours()
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
     // --- LIBRERIA GIOCHI ---
@@ -231,7 +256,38 @@ public class UserService {
         }
     }
 
+    // --- Search Bar --- per la ricerca di Users ---
+    public List<UserCardDTO> searchUsers(String query) {
+        if (query == null || query.trim().isEmpty()) return Collections.emptyList();
+
+        List<UserMongo> users = userMongoRepository.findByUsernameContainingIgnoreCase(query);
+
+        return mapToDTO(users);
+    }
+
+    // --- Show Details Friend ---
+    public List<UserCardDTO> getUserFriendsDetails(String userId) {
+        UserMongo user = userMongoRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<String> friendIds = user.getFriends();
+
+        if (friendIds == null || friendIds.isEmpty()) return Collections.emptyList();
+
+        List<UserMongo> friendsObjects = userMongoRepository.findFriendsNameAndIdByIds(friendIds);
+
+        return mapToDTO(friendsObjects);
+    }
+
+    //Metodo che ci serve sia per getUserFriendsDetails() che in searchUsers(), che prende solo alcune informazioni, e non carica tutti i dati utente
+    private List<UserCardDTO> mapToDTO(List<UserMongo> users) {
+        return users.stream()
+                .map(u -> new UserCardDTO(u.getId(), u.getUsername(), u.getFirstName(), u.getLastName()))
+                .collect(Collectors.toList());
+    }
+
     public boolean userExists(String userId) {
         return userMongoRepository.existsById(userId);
     }
+
 }

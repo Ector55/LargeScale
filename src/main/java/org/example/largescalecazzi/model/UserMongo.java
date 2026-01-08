@@ -29,11 +29,13 @@ public class UserMongo {
     @NotBlank(message = "Username can't be blank")
     @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters")
     @Field("nickname") //perché sul json è stato chiamato nickname
+    @Indexed
     private String username;
 
     //@Indexed(unique = true)
     @NotBlank(message = "Email can't be blank")
     @Email(message = "Email should be valid")
+    @Indexed
     private String email;
 
     @NotBlank(message = "Password can't be blank")

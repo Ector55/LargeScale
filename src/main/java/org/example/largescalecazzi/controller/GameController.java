@@ -1,6 +1,8 @@
 package org.example.largescalecazzi.controller;
 
 import org.example.largescalecazzi.DTO.GameCardDTO;
+import org.example.largescalecazzi.DTO.GameDetailDTO;
+import org.example.largescalecazzi.DTO.ReviewCardDTO;
 import org.example.largescalecazzi.DTO.TrendingGameDTO;
 import org.example.largescalecazzi.model.GameMongo;
 import org.example.largescalecazzi.service.GameService;
@@ -41,10 +43,10 @@ public class GameController {
     }
 
     @GetMapping("/{gameId}/allReviews")
-    public ResponseEntity<List<GameMongo.AllGameReviews>> getAllGameReviews(@PathVariable String gameId){
+    public ResponseEntity<List<ReviewCardDTO>> getAllGameReviews(@PathVariable String gameId){
         try{
-            List<GameMongo.AllGameReviews> allGameReviews = gameService.getAllReviews(gameId);
-            return ResponseEntity.ok(allGameReviews);
+            // Chiama il metodo aggiornato nel service che fa il Batch Load
+            return ResponseEntity.ok(gameService.getAllReviews(gameId));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -74,5 +76,25 @@ public class GameController {
     @GetMapping("/hidden-gems")
     public ResponseEntity<List<GameCardDTO>> getHiddenGems() {
         return ResponseEntity.ok(gameService.getHiddenGems());
+    }
+
+    // Dettaglio completo di un singolo gioco (quando si clicca sopra per dettagli)
+    // Query test GET: localhost:8080/api/games/{gameId}
+    @GetMapping("/{gameId}")
+    public ResponseEntity<GameDetailDTO> getGameDetails(@PathVariable String gameId) {
+        try {
+            // Restituisce descrizione, generi e tutte le info pesanti
+            return ResponseEntity.ok(gameService.getGameDetails(gameId));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Ricerca Giochi per titolo (Search Bar)
+    // Query test GET: localhost:8080/api/games/search?q=Elden
+    @GetMapping("/search")
+    public ResponseEntity<List<GameCardDTO>> searchGames(@RequestParam("q") String query) {
+        // Restituisce una lista leggera di risultati
+        return ResponseEntity.ok(gameService.searchGames(query));
     }
 }
