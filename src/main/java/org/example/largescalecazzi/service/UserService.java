@@ -24,6 +24,9 @@ public class UserService {
     private UserMongoRepository userMongoRepository;
     @Autowired
     private GameMongoRepository gameMongoRepository;
+    @Autowired
+    private UserNeo4jRepository userNeo4jRepository;
+
 
     // --- REGISTRAZIONE ---
     public UserMongo registerUser(UserMongo newUser) {
@@ -31,13 +34,20 @@ public class UserService {
 
         //Salvataggio su MongoDb
         try {
-            return userMongoRepository.save(newUser);
-
+            savedUser = userMongoRepository.save(newUser);
         } catch (DuplicateKeyException e) {
             throw new RuntimeException("Errore: Username o Email già esistenti");
         }
 
-        //va implementato ancora il salvataggio Neo4j
+        // Salvataggio Neo4j
+        try {
+            UserNeo4j neoUser = new UserNeo4j(savedUser.getId(), savedUser.getUsername());
+            userNeo4jRepository.save(neoUser);
+        } catch (Exception e) {
+            System.err.println("WARN: Failed to sync user to Neo4j: " + e.getMessage());
+        }
+
+        return savedUser;
     }
 
     // --- DELETE USER ---
@@ -59,7 +69,11 @@ public class UserService {
             }
         }
 
+        // Delete da Mongo
         userMongoRepository.deleteById(userId);
+
+        // Delete da Neo4j
+        userNeo4jRepository.deleteById(userId);
     }
 
     // --- GETTERS ---
@@ -127,9 +141,11 @@ public class UserService {
         UserMongo.MyGames myGames = new UserMongo.MyGames(gameID, 0.0);
         userMongo.getMyGames().add(myGames);
 
+        // Save su Mongo
         userMongoRepository.save(userMongo);
 
-
+        // Save su Neo4j (viene creata relazione PLAYS)
+        userNeo4jRepository.addGameToLibrary(userID, gameID);
     }
 
     public void updateGameHours(String userID, String gameID, double addedHours) {
@@ -171,7 +187,11 @@ public class UserService {
             }
         }
 
+        // Salvataggio Mongo
         userMongoRepository.save(userMongo);
+
+        //Salvataggio Neo4j
+        userNeo4jRepository.updateGameHours(userID, gameID, myGame.getHours());
     }
 
     private void rebuildTopList(UserMongo userMongo) {
@@ -239,6 +259,9 @@ public class UserService {
         if (!changed) {
             throw new RuntimeException("Siete già amici!");
         }
+
+        // Save su Neo4j
+        userNeo4jRepository.addFriend(userId, friendId);
     }
 
     public void removeFriend(String userId, String friendId) {
@@ -254,6 +277,9 @@ public class UserService {
         if (friend.getFriends().remove(userId)) {
             userMongoRepository.save(friend);
         }
+
+        // Salvataggio Neo4j
+        userNeo4jRepository.removeFriend(userId, friendId);
     }
 
     // --- Search Bar --- per la ricerca di Users ---

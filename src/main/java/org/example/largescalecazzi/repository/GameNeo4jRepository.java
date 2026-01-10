@@ -39,9 +39,8 @@ public interface GameNeo4jRepository extends Neo4jRepository<GameNeo4j, String> 
     // 3. Global query: Giochi influenti di un certo genere
     @Query("MATCH (genre:Genre {name: $genreName}) " +
             "MATCH (genre)<-[:HAS_GENRE]-(g:Game) " +
-            "WITH g, count { (g)<-[:PLAYS]-() } AS influence " +
-            "ORDER BY influence DESC LIMIT 10 " +
-            "RETURN g")
+            "RETURN g, COUNT { (g)<-[:PLAYS]-() } AS influence " +
+            "ORDER BY influence DESC LIMIT 10")
     List<GameNeo4j> findMostInfluentialGameByGenre(@Param("genreName") String genreName);
 
     // Perché non mappare anche le operazioni CRUD? Le operazioni mappate qui servono per non caricare dati pesanti

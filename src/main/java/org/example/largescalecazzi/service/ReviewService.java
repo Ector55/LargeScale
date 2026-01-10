@@ -4,6 +4,7 @@ import org.example.largescalecazzi.model.GameMongo;
 import org.example.largescalecazzi.model.ReviewMongo;
 import org.example.largescalecazzi.repository.GameMongoRepository;
 import org.example.largescalecazzi.repository.ReviewMongoRepository;
+import org.example.largescalecazzi.repository.UserNeo4jRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,8 @@ public class ReviewService {
     private GameMongoRepository gameMongoRepository;
     @Autowired
     private UserService userService;
-
+    @Autowired
+    private UserNeo4jRepository userNeo4jRepository;
 
     // ADD new REVIEW
     // sia alla Collection, sia al gioco a cui fa riferimento e si aggiorna la media score del gioco.
@@ -56,6 +58,9 @@ public class ReviewService {
             System.err.println("WARN: Review salvata ID " + savedReview.getId() +
                     " ma fallito aggiornamento stats gioco " + gameId);
         }
+
+        // Salvataggio su Neo4j (imposta lo score sulla relazione)
+        userNeo4jRepository.updateGameScore(userId, gameId, score);
 
         return savedReview;
     }
@@ -111,14 +116,19 @@ public class ReviewService {
             throw new RuntimeException("You can't delete reviews because you are not the owner of this game");
         }
 
+        String gameId = review.getGameId();
+
         GameMongo game = gameMongoRepository.findById(review.getGameId())
                 .orElseThrow(() -> new RuntimeException("Game not found linked to review"));
 
-        // 4. Aggiorno le statistiche e le liste dentro il Gioco
+        // ---------------Aggiorno le statistiche e le liste dentro il Gioco
         removeReviewFromGameStats(game, review);
 
-        // 5. Cancello fisicamente la review dalla collection
+        // cancello fisicamente la review dalla collection di Mongo
         reviewMongoRepository.delete(review);
+
+        // Cancellazione su Neo4j (rimozione della proprietà score dalla relazione)
+        userNeo4jRepository.removeGameScore(userId, gameId);
     }
 
     private void removeReviewFromGameStats(GameMongo game, ReviewMongo review) {

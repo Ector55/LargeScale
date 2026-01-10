@@ -30,6 +30,7 @@ public class RecommendationController {
     }
 
     // GET: Giochi influenti di un genere
+    // Query Test GET: localhost:8080/api/recommendations/influential?genre=Free To Play
     @GetMapping("/influential")
     public ResponseEntity<List<GameCardDTO>> getInfluentialGames(@RequestParam String genre) {
         return ResponseEntity.ok(recommendationService.getInfluentialGames(genre));

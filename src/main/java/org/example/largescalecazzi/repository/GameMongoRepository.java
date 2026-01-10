@@ -112,8 +112,9 @@ public interface GameMongoRepository extends MongoRepository<GameMongo, String> 
             fields = "{ 'title': 1, 'img': 1, 'average_score': 1, 'reviews_count': 1, '_id': 1 }")
     List<GameMongo> findByTitleRegex(String regexPattern);
 
-    // Visualizzazione LIBRERIA
-    @Query(value = "{ '_id': { '$in': ?0 } }", fields = "{ 'title': 1, 'img': 1, '_id': 1 }")
+    // Visualizzazione LIBRERIA: seleziono solo i campi che mi servono
+    @Query(value = "{ '_id': { '$in': ?0 } }",
+            fields = "{ 'title': 1, 'img': 1, 'average_score': 1, 'reviews_count': 1, '_id': 1 }")
     List<GameMongo> findBasicInfoByIds(List<String> ids);
 
     // Scarichiamo solo la lista degli ID delle recensioni linkate allGameReviews e '_id'.
