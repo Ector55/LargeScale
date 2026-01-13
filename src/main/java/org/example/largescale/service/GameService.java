@@ -89,15 +89,9 @@ public class GameService {
     }
 
     // 1. Visualizzare i dettagli di un gioco
-    public GameDetailDTO getGameDetails(String gameId) {
-        GameMongo g = gameMongoRepository.findById(gameId)
+    public GameMongo getGameDetails(String gameId) {
+        return gameMongoRepository.findById(gameId)
                 .orElseThrow(() -> new RuntimeException("Game not found"));
-
-        return new GameDetailDTO(
-                g.getId(), g.getTitle(), g.getDescription(), g.getImg(),
-                g.getGenres(), g.getAverageScore(), g.getReviewsCount(),
-                g.getLastReviews() != null ? g.getLastReviews() : Collections.emptyList()
-        );
     }
 
     // SEARCH game by titolo

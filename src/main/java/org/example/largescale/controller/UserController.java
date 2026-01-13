@@ -5,6 +5,7 @@ import org.example.largescale.DTO.UserCardDTO;
 import org.example.largescale.model.UserMongo;
 import org.example.largescale.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
@@ -33,7 +34,7 @@ public class UserController {
 
         try {
             UserMongo createdUser = userService.registerUser(user);
-            return ResponseEntity.ok(createdUser);
+            return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
         } catch (RuntimeException e) {
             // Cattura l'errore "Username o Email già esistenti" dal Service
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -46,7 +47,7 @@ public class UserController {
     public ResponseEntity<String> deleteUser(@PathVariable String userId) {
         try {
             userService.deleteUser(userId);
-            return ResponseEntity.ok("User deleted successfully");
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("ERROR: " + e.getMessage());
         }
@@ -131,7 +132,7 @@ public class UserController {
     ) {
         try {
             userService.removeFriend(userId, friendId);
-            return ResponseEntity.ok("Friend removed successfully");
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("ERROR: " + e.getMessage());
         }

@@ -81,11 +81,12 @@ public class GameController {
     // Dettaglio completo di un singolo gioco (quando si clicca sopra per dettagli)
     // Query test GET: localhost:8080/api/games/{gameId}
     @GetMapping("/{gameId}")
-    public ResponseEntity<GameDetailDTO> getGameDetails(@PathVariable String gameId) {
+    public ResponseEntity<GameMongo> getGameDetails(@PathVariable String gameId) {
         try {
-            // Restituisce descrizione, generi e tutte le info pesanti
-            return ResponseEntity.ok(gameService.getGameDetails(gameId));
+            GameMongo game = gameService.getGameDetails(gameId);
+            return ResponseEntity.ok(game);
         } catch (Exception e) {
+
             return ResponseEntity.notFound().build();
         }
     }
