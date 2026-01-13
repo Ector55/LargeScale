@@ -21,7 +21,7 @@ public interface GameNeo4jRepository extends Neo4jRepository<GameNeo4j, String> 
 
     // 2. Content-Based: Giochi simili per genere
     @Query("MATCH (me:User {userId: $userId})-[:PLAYS]->(:Game)-[:HAS_GENRE]->(g:Genre) " +
-            "WITH me, g, count(*) AS frequency ORDER BY frequency DESC LIMIT 5 " +
+            "WITH me, g, count(*) AS frequency ORDER BY frequency DESC LIMIT 3 " +
             "WITH me, collect(g) AS myTopGenres " +
             "UNWIND myTopGenres AS genre " +
             "CALL { " +
