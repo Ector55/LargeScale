@@ -9,6 +9,9 @@ import java.util.List;
 
 public interface UserNeo4jRepository extends Neo4jRepository<UserNeo4j, String> {
 
+    @Query("MATCH (u:User {userId: $userId})-[:IS_FRIEND_WITH]-(f:User) RETURN f.userId")
+    List<String> findFriendIds(@Param("userId") String userId);
+
     // Friends Discovery: Trova utenti simili
     @Query("MATCH (me:User {userId: $userId})-[myPlay:PLAYS]->(commonGame:Game) " +
             "WHERE myPlay.hours > 50 AND (myPlay.score IS NULL OR myPlay.score >= 4) " +

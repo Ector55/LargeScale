@@ -1,5 +1,6 @@
 package org.example.largescale.model;
 
+import lombok.AllArgsConstructor;
 import org.springframework.data.neo4j.core.schema.RelationshipId;
 import org.springframework.data.neo4j.core.schema.RelationshipProperties;
 import org.springframework.data.neo4j.core.schema.TargetNode;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 @RelationshipProperties
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 public class PlaysRelationship {
     @RelationshipId
@@ -18,9 +20,4 @@ public class PlaysRelationship {
 
     private Double hours;
     private Integer score;
-
-    public PlaysRelationship(GameNeo4j game, Double hours) {
-        this.game = game;
-        this.hours = hours;
-    }
 }

@@ -1,9 +1,11 @@
 package org.example.largescale.service;
 
 import org.example.largescale.DTO.UserCardDTO;
+import org.example.largescale.model.DeletedUserTask;
 import org.example.largescale.model.GameMongo;
 import org.example.largescale.model.UserMongo;
 import org.example.largescale.model.UserNeo4j;
+import org.example.largescale.repository.CleanupQueueRepository;
 import org.example.largescale.repository.GameMongoRepository;
 import org.example.largescale.repository.UserMongoRepository;
 import org.example.largescale.repository.UserNeo4jRepository;
@@ -28,7 +30,8 @@ public class UserService {
     private GameMongoRepository gameMongoRepository;
     @Autowired
     private UserNeo4jRepository userNeo4jRepository;
-
+    @Autowired
+    private CleanupQueueRepository cleanupQueueRepository;
 
     // --- REGISTRAZIONE ---
     public UserMongo registerUser(UserMongo newUser) {
@@ -54,28 +57,16 @@ public class UserService {
 
     // --- DELETE USER ---
     public void deleteUser(String userId) {
-        // Dobbiamo cancellare l'id dell'user dalle liste di amicizie degli altri utenti
-        UserMongo userToDelete = userMongoRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
 
-        if (userToDelete.getFriends() != null && !userToDelete.getFriends().isEmpty()) {
-            for (String friendId : userToDelete.getFriends()) {
-                userMongoRepository.findById(friendId).ifPresent(friend -> {
-                    if (friend.getFriends() != null) {
-                        boolean removed = friend.getFriends().remove(userId);
-                        if (removed) {
-                            userMongoRepository.save(friend);
-                        }
-                    }
-                });
-            }
+        if (!userMongoRepository.existsById(userId)) {
+            throw new RuntimeException("User not found: " + userId);
         }
 
-        // Delete da Mongo
         userMongoRepository.deleteById(userId);
 
-        // Delete da Neo4j
         userNeo4jRepository.deleteById(userId);
+
+        cleanupQueueRepository.save(new DeletedUserTask(null, userId, java.time.Instant.now()));
     }
 
     // --- GETTERS ---
@@ -223,54 +214,51 @@ public class UserService {
     public void addFriend(String userId, String friendId) {
         if (userId.equals(friendId)) throw new RuntimeException("Non puoi essere amico di te stesso!");
 
-        UserMongo user = userMongoRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
-        UserMongo friend = userMongoRepository.findById(friendId)
-                .orElseThrow(() -> new RuntimeException("Friend not found: " + friendId));
-
-        if (user.getFriends() == null) user.setFriends(new ArrayList<>());
-        if (friend.getFriends() == null) friend.setFriends(new ArrayList<>());
-
-        boolean changed = false;
-
-        // Aggiungo B agli amici di A
-        if (!user.getFriends().contains(friendId)) {
-            user.getFriends().add(friendId);
-            userMongoRepository.save(user);
-            changed = true;
-        }
-
-        // Aggiungo A agli amici di B (Amicizia bidirezionale)
-        if (!friend.getFriends().contains(userId)) {
-            friend.getFriends().add(userId);
-            userMongoRepository.save(friend);
-            changed = true;
-        }
-
-        if (!changed) {
-            throw new RuntimeException("Siete già amici!");
-        }
-
-        // Save su Neo4j
+        // 1. PRIMA su Neo4j (Obbligatorio)
         userNeo4jRepository.addFriend(userId, friendId);
+
+        // 2. POI su Mongo (Best Effort / Backup)
+        try {
+            UserMongo user = userMongoRepository.findById(userId).orElseThrow();
+            UserMongo friend = userMongoRepository.findById(friendId).orElseThrow();
+
+            if (user.getFriends() == null) user.setFriends(new ArrayList<>());
+            if (friend.getFriends() == null) friend.setFriends(new ArrayList<>());
+
+            boolean updated = false;
+            if (!user.getFriends().contains(friendId)) {
+                user.getFriends().add(friendId);
+                userMongoRepository.save(user);
+                updated = true;
+            }
+            if (!friend.getFriends().contains(userId)) {
+                friend.getFriends().add(userId);
+                userMongoRepository.save(friend);
+                updated = true;
+            }
+        } catch (Exception e) {
+            System.err.println("WARN: Sync Mongo fallito (Amicizia salvata solo su Neo4j): " + e.getMessage());
+        }
     }
 
     public void removeFriend(String userId, String friendId) {
-        UserMongo user = userMongoRepository.findById(userId).orElseThrow();
-        UserMongo friend = userMongoRepository.findById(friendId).orElseThrow();
-
-        if (user.getFriends() == null) return;
-        if (friend.getFriends() == null) return;
-
-        if (user.getFriends().remove(friendId)) {
-            userMongoRepository.save(user);
-        }
-        if (friend.getFriends().remove(userId)) {
-            userMongoRepository.save(friend);
-        }
-
-        // Salvataggio Neo4j
+        // 1. Delete Neo4j
         userNeo4jRepository.removeFriend(userId, friendId);
+
+        // 2. Delete Mongo (Best Effort)
+        try {
+            UserMongo user = userMongoRepository.findById(userId).orElse(null);
+            UserMongo friend = userMongoRepository.findById(friendId).orElse(null);
+
+            if (user != null && user.getFriends() != null && user.getFriends().remove(friendId)) {
+                userMongoRepository.save(user);
+            }
+            if (friend != null && friend.getFriends() != null && friend.getFriends().remove(userId)) {
+                userMongoRepository.save(friend);
+            }
+        } catch (Exception e) {
+            System.err.println("WARN: Rimozione Mongo fallita: " + e.getMessage());
+        }
     }
 
     // --- Search Bar --- per la ricerca di Users ---
@@ -284,21 +272,24 @@ public class UserService {
 
     // --- Show Details Friend ---
     public List<UserCardDTO> getUserFriendsDetails(String userId) {
-        UserMongo user = userMongoRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        // 1. Neo4j (Verità)
+        List<String> realFriendIds = userNeo4jRepository.findFriendIds(userId);
 
-        List<String> friendIds = user.getFriends();
+        if (realFriendIds.isEmpty()) return Collections.emptyList();
 
-        if (friendIds == null || friendIds.isEmpty()) return Collections.emptyList();
+        // 2. Mongo (Dettagli)
+        List<UserMongo> friendsObjects = userMongoRepository.findAllById(realFriendIds);
 
-        List<UserMongo> friendsObjects = userMongoRepository.findFriendsNameAndIdByIds(friendIds);
-
+        // 3. Mapping (usando il metodo helper sicuro)
         return mapToDTO(friendsObjects);
     }
 
     //Metodo che ci serve sia per getUserFriendsDetails() che in searchUsers(), che prende solo alcune informazioni, e non carica tutti i dati utente
     private List<UserCardDTO> mapToDTO(List<UserMongo> users) {
+        if (users == null || users.isEmpty()) return Collections.emptyList();
+
         return users.stream()
+                .filter(java.util.Objects::nonNull) // PROTEZIONE AGGIUNTA QUI
                 .map(u -> new UserCardDTO(u.getId(), u.getUsername(), u.getFirstName(), u.getLastName()))
                 .collect(Collectors.toList());
     }
