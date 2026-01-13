@@ -36,7 +36,7 @@ public class UserController {
 
         try {
             UserMongo createdUser = userService.registerUser(user);
-            return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
         } catch (RuntimeException e) {
             // Cattura l'errore "Username o Email già esistenti" dal Service
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -90,7 +90,7 @@ public class UserController {
     ){
         try {
             userService.addGameToLibrary(userId, gameId);
-            return ResponseEntity.ok("Game added");
+            return ResponseEntity.status(HttpStatus.CREATED).body("Game Added");
         } catch (Exception e){
             return ResponseEntity.badRequest().body("ERROR: " + e.getMessage());
         }
@@ -123,7 +123,7 @@ public class UserController {
     ) {
         try {
             userService.addFriend(userId, friendId);
-            return ResponseEntity.ok("Friend added successfully");
+            return ResponseEntity.status(HttpStatus.CREATED).body("Friend added");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("ERROR: " + e.getMessage());
         }
