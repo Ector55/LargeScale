@@ -27,7 +27,7 @@ async function loadMyGames() {
     const oldGames = document.querySelectorAll(".gamebox");
     oldGames.forEach(box => box.remove());
 
-    const data = await getData("http://localhost:8080/api/games"); 
+    const data = await getData("http://localhost:8080/api/users/76767/topPlayedGames"); 
 
     if (!data) return;
 
@@ -46,12 +46,12 @@ async function loadMyGames() {
         container.insertAdjacentHTML('beforeend', gameHTML);
     })
 }
-async function loadSuggestedGames() {
+async function loadSuggestedGamesByGenere() {
     const container = document.querySelector(".sgbox");
     const oldSuggestGames = document.querySelectorAll(".gameSugg");
     oldSuggestGames.forEach(box => box.remove());
 
-    const data = suggestedGamesData;
+    const data = await getData("http://localhost:8080/api/recommendations/content/76767"); 
     data.forEach(game =>{
         const gameHTML= `
             <div class="gameSugg">
@@ -59,7 +59,7 @@ async function loadSuggestedGames() {
                     <img src="${game.img}" alt="${game.title}" class="gameimage">
                 </div>
                 <h2 class="gameTitleSugg">${game.title}</h2>
-                <h3 class="motivationSugg">${game.motivation}</h3>
+                <h3 class="motivationSugg">Suggested based on your favorite generes</h3>
                 <div class="button-container">
                 <button class="add-btn" data-title="${game.title}" data-img="${game.img}">+</button>
             </div>
@@ -73,17 +73,17 @@ async function loadSuggestedGamers() {
     const oldPerson = document.querySelectorAll(".personSugg");
     oldPerson.forEach(box => box.remove());
 
-    const data = suggestedGamersData;
+    const data = await getData("http://localhost:8080/api/recommendations/people/76767"); 
     data.forEach(person => {
         const personHTML = `
         <div class="personSugg">
                          <div class="avatar">
                             <div class="avatarImageContainer">
-                                <img src="${person.img}" alt="${person.img}" class="avatarImage">
+                                <img src="./src/avatar.webp" alt="./src/avatar.webp" class="avatarImage">
                             </div>
                         </div>
-                        <h1 class="userName">${person.userName}</h1>
-                        <div class="motivationSugg">${person.motivation}</div>
+                        <h1 class="userName">${person.username}</h1>
+                        <div class="motivationSugg">Suggested for you</div>
                         <div class="button-container">
                             <a href="#" class="add-btn">♡</a>
                         </div>
@@ -124,7 +124,7 @@ function setupInteraction() {
 
 document.addEventListener('DOMContentLoaded', () => {
     loadMyGames();
-    loadSuggestedGames();
+    loadSuggestedGamesByGenere();
     loadSuggestedGamers();
     setupInteraction();
 });

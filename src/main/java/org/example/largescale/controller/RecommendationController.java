@@ -12,6 +12,7 @@ import java.util.List;
 //TUTTA LA CLASSE DA TESTARE ANCORA
 @RestController
 @RequestMapping("/api/recommendations")
+@CrossOrigin(origins = "*")
 public class RecommendationController {
 
     @Autowired
