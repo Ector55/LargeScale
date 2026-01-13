@@ -3,6 +3,9 @@ package org.example.largescale.repository;
 import org.example.largescale.DTO.GameCardDTO;
 import org.example.largescale.DTO.TrendingGameDTO;
 import org.example.largescale.model.GameMongo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -120,5 +123,8 @@ public interface GameMongoRepository extends MongoRepository<GameMongo, String> 
     // Scarichiamo solo la lista degli ID delle recensioni linkate allGameReviews e '_id'.
     @Query(value = "{ '_id': ?0 }", fields = "{ 'showOtherReviews': 1, '_id': 1 }")
     GameMongo findLinkedReviewsOnly(String gameId);
+
+    //Filtra per ID + Pagina + Ordina
+    Page<GameMongo> findByIdIn(List<String> ids, Pageable pageable);
 }
 

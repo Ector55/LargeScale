@@ -9,6 +9,9 @@ import org.example.largescale.repository.GameMongoRepository;
 import org.example.largescale.repository.UserMongoRepository;
 import org.example.largescale.repository.UserNeo4jRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.dao.DuplicateKeyException;
 
@@ -87,37 +90,26 @@ public class UserService {
         return topGames;
     }
 
-    public List<LibraryGameDTO> getMyGames(String userId) {
-        // RECUPERO SOLO LA LISTA GIOCHI. Scarica solo 'myGames', ignorando amici, password, ecc.
+    public Page<GameMongo> getMyGames(String userId, int page, int size, String sortBy, String direction) {
+        // 1. Recupera la lista degli ID dell'utente (usando la query leggera che avevamo già)
         UserMongo user = userMongoRepository.findMyGamesOnly(userId);
 
-        if (user == null) {
-            throw new RuntimeException("User not found: " + userId);
+        // Gestione casi vuoti
+        if (user == null || user.getMyGames() == null || user.getMyGames().isEmpty()) {
+            return Page.empty();
         }
 
-        if (user.getMyGames() == null || user.getMyGames().isEmpty()) {
-            return Collections.emptyList();
-        }
-
+        // 2. Estrai solo la lista di Stringhe (ID)
         List<String> gameIds = user.getMyGames().stream()
                 .map(UserMongo.MyGames::getGameId)
                 .collect(Collectors.toList());
 
-        Map<String, GameMongo> gamesMap = gameMongoRepository.findBasicInfoByIds(gameIds).stream()
-                .collect(Collectors.toMap(GameMongo::getId, g -> g));
+        // 3. Crea il Pageable standard
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
 
-        return user.getMyGames().stream()
-                .filter(myGame -> gamesMap.containsKey(myGame.getGameId()))
-                .map(myGame -> {
-                    GameMongo details = gamesMap.get(myGame.getGameId());
-                    return new LibraryGameDTO(
-                            details.getId(),
-                            details.getTitle(),
-                            details.getImg(),
-                            myGame.getHours()
-                    );
-                })
-                .collect(Collectors.toList());
+        // 4. DELEGA TOTALE A MONGO: "Dammi i giochi che sono in questa lista, ma solo pagina X"
+        return gameMongoRepository.findByIdIn(gameIds, pageable);
     }
 
     // --- LIBRERIA GIOCHI ---

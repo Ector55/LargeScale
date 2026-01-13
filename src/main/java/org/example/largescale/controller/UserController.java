@@ -2,9 +2,11 @@ package org.example.largescale.controller;
 
 import org.example.largescale.DTO.LibraryGameDTO;
 import org.example.largescale.DTO.UserCardDTO;
+import org.example.largescale.model.GameMongo;
 import org.example.largescale.model.UserMongo;
 import org.example.largescale.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -67,13 +69,16 @@ public class UserController {
 
     // Query test GET: localhost:8080/api/users/{USER_ID}/library
     @GetMapping("/{userId}/library")
-    public ResponseEntity<List<LibraryGameDTO>> getMyGames(@PathVariable String userId){
-        try{
-            // Il Service ora fa il "Merge" e restituisce i dati pronti per il Frontend
-            return ResponseEntity.ok(userService.getMyGames(userId));
-        } catch(Exception e){
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Page<GameMongo>> getMyGames(
+            @PathVariable String userId,
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "20") int pageSize,
+            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "ASC") String direction
+    ){
+        return ResponseEntity.ok(
+                userService.getMyGames(userId, pageNumber, pageSize, sortBy, direction)
+        );
     }
 
     // ADD game alla libreria
