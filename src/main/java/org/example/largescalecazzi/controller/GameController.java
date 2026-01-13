@@ -90,8 +90,6 @@ public class GameController {
         }
     }
 
-    // Ricerca Giochi per titolo (Search Bar)
-    // Query test GET: localhost:8080/api/games/search?q=Elden
     @GetMapping("/search")
     public ResponseEntity<List<GameCardDTO>> searchGames(@RequestParam("q") String query) {
         // Restituisce una lista leggera di risultati

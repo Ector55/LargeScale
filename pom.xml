@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.example</groupId>
-    <artifactId>LargeScaleCazzi</artifactId>
+    <artifactId>LargeScale</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>LargeScaleCazzi</name>
     <description>LargeScaleCazzi</description>

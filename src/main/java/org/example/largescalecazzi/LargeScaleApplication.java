@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class LargeScaleCazziApplication {
+public class LargeScaleApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(LargeScaleCazziApplication.class, args);
+        SpringApplication.run(LargeScaleApplication.class, args);
     }
 
 }
