@@ -1,7 +1,6 @@
 package org.example.largescale.controller;
 
 import org.example.largescale.DTO.GameCardDTO;
-import org.example.largescale.DTO.GameDetailDTO;
 import org.example.largescale.DTO.ReviewCardDTO;
 import org.example.largescale.DTO.TrendingGameDTO;
 import org.example.largescale.model.GameMongo;
