@@ -41,22 +41,20 @@ public interface GameMongoRepository extends MongoRepository<GameMongo, String> 
 
     // TOP DECLINING
     @Aggregation(pipeline = {
-            // 1. Calcola media recente
+            // Calcola la recent avarage score
             "{ '$addFields': { 'recentAverageScore': { '$avg': { '$slice': ['$lastReviews.score', 5] } } } }",
 
             "{ '$match': { 'recentAverageScore': { '$ne': null }, 'average_score': { '$ne': null } } }",
 
-            // 3. Calcola Gap (Storico - Recente)
+            // Calcola la differenza (Avarage score - Recente avarage score)
             "{ '$addFields': { 'scoreDifference': { '$subtract': ['$average_score', '$recentAverageScore'] } } }",
 
-            // 4. Solo positivi
+            // prendiamo solo i positivi
             "{ '$match': { 'scoreDifference': { '$gt': 0 } } }",
 
-            // 5. Ordina e limita
             "{ '$sort': { 'scoreDifference': -1 } }",
             "{ '$limit': 10 }",
 
-            // 6. Restituiamo il campo "average_score" esattamente come si chiama nel DB.
             "{ '$project': { " +
                     "'id': '$_id', " +
                     "'title': 1, " +
@@ -74,7 +72,7 @@ public interface GameMongoRepository extends MongoRepository<GameMongo, String> 
             "{ '$addFields': { 'recentAverageScore': { '$avg': { '$slice': ['$lastReviews.score', 5] } } } }",
             "{ '$match': { 'recentAverageScore': { '$ne': null }, 'average_score': { '$ne': null } } }",
 
-            // Calcola Gap (Recente - Storico)
+            // Calcola differenza (recent avarage score - avarage score)
             "{ '$addFields': { 'scoreDifference': { '$subtract': ['$recentAverageScore', '$average_score'] } } }",
 
             "{ '$match': { 'scoreDifference': { '$gt': 0 } } }",

@@ -37,7 +37,6 @@ public class RecommendationController {
         return ResponseEntity.ok(recommendationService.getInfluentialGames(genre));
     }
 
-    // GET: Possibili amici
     @GetMapping("/people/{userId}")
     public ResponseEntity<List<UserCardDTO>> getPotentialFriends(@PathVariable String userId) {
         return ResponseEntity.ok(recommendationService.getPotentialFriends(userId));

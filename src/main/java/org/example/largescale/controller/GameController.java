@@ -19,8 +19,7 @@ public class GameController {
     @Autowired
     private GameService gameService;
 
-    // query per test: localhost:8080/api/games/top-rated
-    // query per test: localhost:8080/api/games/top-rated?genre=Action
+
     @GetMapping
     public ResponseEntity<Page<GameMongo>> getAllGames(
             @RequestParam(defaultValue = "0") int pageNumber,
@@ -51,7 +50,7 @@ public class GameController {
         }
     }
 
-    // query test: localhost:8080/api/games/top-rated
+    // query per test: localhost:8080/api/games/top-rated?genre=Action
     @GetMapping("/top-rated")
     public ResponseEntity<List<GameCardDTO>> getTopRatedGames(
             @RequestParam(required = false) String genre
@@ -92,7 +91,6 @@ public class GameController {
 
     @GetMapping("/search")
     public ResponseEntity<List<GameCardDTO>> searchGames(@RequestParam("q") String query) {
-        // Restituisce una lista leggera di risultati
         return ResponseEntity.ok(gameService.searchGames(query));
     }
 }

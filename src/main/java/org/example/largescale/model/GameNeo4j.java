@@ -14,10 +14,11 @@ import java.util.List;
 @NoArgsConstructor
 public class GameNeo4j {
     @Id
-    private String gameId; // Deve coincidere con Mongo ID
+    private String gameId;
 
     private String title;
 
     @Relationship(type = "HAS_GENRE", direction = Relationship.Direction.OUTGOING)
     private List<GenreNeo4j> genres;
 }
+

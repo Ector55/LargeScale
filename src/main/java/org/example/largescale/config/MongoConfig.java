@@ -5,6 +5,7 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.ReadPreference;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +32,8 @@ public class MongoConfig {
                     .applyToConnectionPoolSettings(builder ->
                             builder.maxSize(50))
                     .retryWrites(true)
-                    .writeConcern(WriteConcern.MAJORITY)
+                    .writeConcern(WriteConcern.ACKNOWLEDGED)
+                    .readPreference(ReadPreference.nearest())
                     .build();
 
             mongoIstance = MongoClients.create(settings);

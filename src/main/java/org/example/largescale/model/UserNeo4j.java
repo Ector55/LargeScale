@@ -18,8 +18,6 @@ public class UserNeo4j {
 
     private String username;
 
-    // Ricordiamoci!!! In Neo4j l'arco deve avere una direzione unica, quindi per rappresentare
-    // l'amicizia "bidirezionale" nelle query useremo il pattern "Undirected" (senza freccia)
     @Relationship(type = "IS_FRIEND_WITH")
     private List<UserNeo4j> friends;
 
